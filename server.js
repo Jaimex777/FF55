@@ -4,7 +4,6 @@ const fs = require('fs');
 const axios = require('axios');
 
 const app = express();
-
 // Aumentar el límite de tamaño para las solicitudes a 10MB
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -23,6 +22,32 @@ app.get('/api/restaurants', (req, res) => {
       res.json(JSON.parse(data));
     }
   });
+});
+
+// Ruta para actualizar la imagen de portada del restaurante
+app.put('/api/restaurants/:restaurantIndex/image', async (req, res) => {
+  const { restaurantIndex } = req.params;
+  const { image } = req.body;
+
+  let restaurants = require('./restaurants.json');
+  const restIdx = parseInt(restaurantIndex);
+
+  if (restaurants[restIdx]) {
+      restaurants[restIdx].image = image;
+      fs.writeFileSync('restaurants.json', JSON.stringify(restaurants, null, 2), 'utf8');
+
+      // Subir los cambios a GitHub
+      try {
+          await commitChanges('restaurants.json', JSON.stringify(restaurants), 'Actualizar imagen de portada del restaurante');
+          res.status(200).send({ message: 'Imagen de portada actualizada exitosamente' });
+      } catch (error) {
+          console.error('Error subiendo cambios a GitHub:', error.response ? error.response.data : error.message);
+          res.status(500).send({ message: 'Imagen actualizada, pero no se pudo guardar en GitHub' });
+      }
+
+  } else {
+      res.status(404).send({ message: 'Restaurante no encontrado' });
+  }
 });
 
 // Ruta para agregar un nuevo plato al menú y subir cambios a GitHub
