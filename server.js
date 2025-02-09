@@ -22,8 +22,8 @@ app.get('/api/restaurants', (req, res) => {
   });
 });
 
-// Ruta para agregar un nuevo plato al menú
-app.post('/api/restaurants/:restaurantIndex/menu', (req, res) => {
+// Ruta para agregar un nuevo plato al menú y subir cambios a GitHub
+app.post('/api/restaurants/:restaurantIndex/menu', async (req, res) => {
   const { restaurantIndex } = req.params;
   const newItem = req.body;
 
@@ -33,30 +33,23 @@ app.post('/api/restaurants/:restaurantIndex/menu', (req, res) => {
   if (restaurants[restIdx]) {
       restaurants[restIdx].menu.push(newItem);
       fs.writeFileSync('restaurants.json', JSON.stringify(restaurants, null, 2), 'utf8');
-      res.status(200).send({ message: 'Producto agregado exitosamente' });
+
+      // Subir los cambios a GitHub después de agregar el producto
+      try {
+          await commitChanges('restaurants.json', JSON.stringify(restaurants), 'Agregar nuevo producto');
+          res.status(200).send({ message: 'Producto agregado y guardado en GitHub exitosamente' });
+      } catch (error) {
+          console.error('Error subiendo cambios a GitHub:', error);
+          res.status(500).send({ message: 'Producto agregado, pero no se pudo guardar en GitHub' });
+      }
+
   } else {
       res.status(404).send({ message: 'Restaurante no encontrado' });
   }
 });
 
-// Ruta para manejar cambios en los productos
-app.post('/update-products', async (req, res) => {
-  const { newData } = req.body;
-
-  const jsonFilePath = 'restaurants.json';
-  fs.writeFileSync(jsonFilePath, JSON.stringify(newData, null, 2), 'utf8');
-
-  try {
-    await commitChanges(jsonFilePath, JSON.stringify(newData), 'Actualizar productos del restaurante');
-    res.status(200).send({ message: 'Cambios guardados y subidos a GitHub' });
-  } catch (error) {
-    console.error('Error subiendo cambios a GitHub:', error);
-    res.status(500).send({ message: 'Error subiendo cambios a GitHub' });
-  }
-});
-
 // Ruta para eliminar un producto
-app.delete('/api/restaurants/:restaurantIndex/menu/:itemIndex', (req, res) => {
+app.delete('/api/restaurants/:restaurantIndex/menu/:itemIndex', async (req, res) => {
   const { restaurantIndex, itemIndex } = req.params;
 
   let restaurants = require('./restaurants.json');
@@ -66,10 +59,17 @@ app.delete('/api/restaurants/:restaurantIndex/menu/:itemIndex', (req, res) => {
 
   if (restaurants[restIdx] && restaurants[restIdx].menu[itemIdx]) {
     restaurants[restIdx].menu.splice(itemIdx, 1);
-
     fs.writeFileSync('restaurants.json', JSON.stringify(restaurants, null, 2), 'utf8');
 
-    res.status(200).send({ message: 'Producto eliminado exitosamente' });
+    // Subir cambios a GitHub después de eliminar el producto
+    try {
+        await commitChanges('restaurants.json', JSON.stringify(restaurants), 'Eliminar producto');
+        res.status(200).send({ message: 'Producto eliminado y cambios guardados en GitHub' });
+    } catch (error) {
+        console.error('Error subiendo cambios a GitHub:', error);
+        res.status(500).send({ message: 'Producto eliminado, pero no se pudo guardar en GitHub' });
+    }
+
   } else {
     res.status(404).send({ message: 'Producto no encontrado' });
   }
