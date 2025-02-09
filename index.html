@@ -5,12 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant App</title>
     <script src="https://cdn.tailwindcss.com">
+        // Cargar el título guardado desde localStorage al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTitle = localStorage.getItem('appTitle');
+            if (savedTitle) {
+                document.getElementById('app-title').textContent = savedTitle;
+            }
+        });
+
+        // Permitir al admin cambiar el título y guardarlo en localStorage
         function enableAdminTitleEdit() {
             const appTitle = document.getElementById('app-title');
             appTitle.addEventListener('click', () => {
                 const newTitle = prompt("Ingrese el nuevo nombre para la aplicación:", appTitle.textContent);
                 if (newTitle) {
                     appTitle.textContent = newTitle;
+                    localStorage.setItem('appTitle', newTitle); // Guardar en localStorage
                 }
             });
         }
@@ -269,7 +279,7 @@
                     <img src="${item.image}" alt="${item.name}" class="h-48 w-full object-cover rounded-t-lg">
                     <h3 class="text-xl font-bold mt-2">${item.name}</h3>
                     <p class="text-gray-600">${item.description}</p>
-                    <p class="text-lg font-semibold mt-2">${item.price}</p>
+                    <p class="text-lg font-semibold mt-2">${item.price} €</p>
                 `;
 
                 if (isOwner) {
@@ -306,12 +316,22 @@
 
         fetchRestaurants();
     
+        // Cargar el título guardado desde localStorage al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTitle = localStorage.getItem('appTitle');
+            if (savedTitle) {
+                document.getElementById('app-title').textContent = savedTitle;
+            }
+        });
+
+        // Permitir al admin cambiar el título y guardarlo en localStorage
         function enableAdminTitleEdit() {
             const appTitle = document.getElementById('app-title');
             appTitle.addEventListener('click', () => {
                 const newTitle = prompt("Ingrese el nuevo nombre para la aplicación:", appTitle.textContent);
                 if (newTitle) {
                     appTitle.textContent = newTitle;
+                    localStorage.setItem('appTitle', newTitle); // Guardar en localStorage
                 }
             });
         }
@@ -341,12 +361,22 @@ function changeRestaurantName(index) {
     }
 }
 
+        // Cargar el título guardado desde localStorage al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTitle = localStorage.getItem('appTitle');
+            if (savedTitle) {
+                document.getElementById('app-title').textContent = savedTitle;
+            }
+        });
+
+        // Permitir al admin cambiar el título y guardarlo en localStorage
         function enableAdminTitleEdit() {
             const appTitle = document.getElementById('app-title');
             appTitle.addEventListener('click', () => {
                 const newTitle = prompt("Ingrese el nuevo nombre para la aplicación:", appTitle.textContent);
                 if (newTitle) {
                     appTitle.textContent = newTitle;
+                    localStorage.setItem('appTitle', newTitle); // Guardar en localStorage
                 }
             });
         }
