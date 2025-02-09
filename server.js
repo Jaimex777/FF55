@@ -6,7 +6,8 @@ const PORT = process.env.PORT || 3000;
 
 const dataPath = path.join(__dirname, 'restaurants.json');
 
-app.use(express.json());
+// Aumentar el límite de carga a 50MB para permitir imágenes más grandes
+app.use(express.json({ limit: '50mb' }));
 app.use(express.static(__dirname));
 
 // Servir index.html en la raíz
@@ -60,6 +61,29 @@ app.post('/api/restaurants/:restaurantIndex/menu', (req, res) => {
             fs.writeFile(dataPath, JSON.stringify(restaurants, null, 2), err => {
                 if (err) return res.status(500).send('Error al guardar los cambios');
                 res.send('Producto agregado correctamente');
+            });
+        } else {
+            res.status(404).send('Restaurante no encontrado');
+        }
+    });
+});
+
+// Actualizar la imagen de portada del restaurante
+app.put('/api/restaurants/:restaurantIndex/image', (req, res) => {
+    const { restaurantIndex } = req.params;
+    const { image } = req.body;
+
+    fs.readFile(dataPath, 'utf8', (err, data) => {
+        if (err) return res.status(500).send('Error al leer los datos');
+
+        let restaurants = JSON.parse(data);
+
+        if (restaurants[restaurantIndex]) {
+            restaurants[restaurantIndex].image = image;
+
+            fs.writeFile(dataPath, JSON.stringify(restaurants, null, 2), err => {
+                if (err) return res.status(500).send('Error al guardar la nueva imagen');
+                res.send('Imagen actualizada correctamente');
             });
         } else {
             res.status(404).send('Restaurante no encontrado');
