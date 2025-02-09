@@ -144,20 +144,12 @@
         let restaurantData = [];
         let loggedInUser = null;
 
-        async 
-async function fetchRestaurants() {
-    try {
-        const response = await fetch('/api/restaurants');
-        if (!response.ok) throw new Error('Error al cargar los restaurantes');
-        restaurantData = await response.json();
-        displayRestaurants();
-    } catch (error) {
-        console.error('Error al cargar los restaurantes:', error);
-        const restaurantList = document.getElementById('restaurant-list');
-        restaurantList.innerHTML = '<p class="text-center text-xl text-red-500">No se pudieron cargar los restaurantes. Inténtelo más tarde.</p>';
-    }
-}
- catch (error) {
+        async function fetchRestaurants() {
+            try {
+                const response = await fetch('/api/restaurants');
+                restaurantData = await response.json();
+                displayRestaurants();
+            } catch (error) {
                 console.error('Error al cargar los restaurantes:', error);
             }
         }
@@ -185,43 +177,14 @@ async function fetchRestaurants() {
             }
         }
 
-        
-
-function displayRestaurants() {
-    document.getElementById('app-title').classList.remove('hidden');
-    const restaurantList = document.getElementById('restaurant-list');
-    restaurantList.innerHTML = '';
-
-    if (!restaurantData || restaurantData.length === 0) {
-        restaurantList.innerHTML = '<p class="text-center text-xl text-gray-500">No hay restaurantes disponibles</p>';
-        return;
-    }
-
-    restaurantData.forEach((restaurant, index) => {
-        const div = document.createElement('div');
-        div.className = 'restaurant-card bg-white rounded-lg shadow-lg cursor-pointer relative';
-        div.innerHTML = `
-            <div class="h-48 bg-cover bg-center rounded-t-lg" style="background-image: url('${restaurant.image || 'https://via.placeholder.com/300x200'}')"></div>
-            <div class="p-4 text-center font-bold text-xl">${restaurant.name || 'Restaurante Sin Nombre'}</div>
-        `;
-        div.onclick = () => showMenu(index, loggedInUser && (loggedInUser.owner === 'admin' || loggedInUser.owner === restaurant.owner));
-        restaurantList.appendChild(div);
-    });
-}
-
-
-    restaurantData.forEach((restaurant, index) => {
-        const div = document.createElement('div');
-        div.className = 'restaurant-card bg-white rounded-lg shadow-lg cursor-pointer relative';
-        div.innerHTML = `
-            <div class="h-48 bg-cover bg-center rounded-t-lg" style="background-image: url('${restaurant.image || 'https://via.placeholder.com/150'}')"></div>
-            <div class="p-4 text-center font-bold text-xl">${restaurant.name || 'Restaurante Sin Nombre'}</div>
-        `;
-        div.onclick = () => showMenu(index, loggedInUser && (loggedInUser.owner === 'admin' || loggedInUser.owner === restaurant.owner));
-        restaurantList.appendChild(div);
-    });
-}
-')"></div>
+        function displayRestaurants() {
+            const restaurantList = document.getElementById('restaurant-list');
+            restaurantList.innerHTML = '';
+            restaurantData.forEach((restaurant, index) => {
+                const div = document.createElement('div');
+                div.className = 'restaurant-card bg-white rounded-lg shadow-lg cursor-pointer relative';
+                div.innerHTML = `
+                    <div class="h-48 bg-cover bg-center rounded-t-lg" style="background-image: url('${restaurant.image}')"></div>
                     <div class="p-4 text-center font-bold text-xl">${restaurant.name}</div>
                 `;
                 div.onclick = () => {
@@ -365,25 +328,40 @@ function showMenu(index, isOwner) {
     const restaurant = restaurantData[index];
     document.getElementById('menu-title').textContent = restaurant.name;
 
-    const defaultHours = 'Lunes a Viernes: 12:00 - 22:00';
-    const defaultWeekendHours = 'Sábados y Domingos: 13:00 - 23:00';
-    const defaultContact = '123-456-789';
+    document.getElementById('restaurant-hours').textContent = restaurant.hours || 'Lunes a Viernes: 12:00 - 22:00';
+    document.getElementById('restaurant-weekend-hours').textContent = restaurant.weekendHours || 'Sábados y Domingos: 13:00 - 23:00';
+    document.getElementById('restaurant-contact').textContent = `Teléfono: ${restaurant.contact || '123-456-789'}`;
 
-    const restaurantInfo = document.getElementById('restaurant-info');
-    restaurantInfo.innerHTML = `
-        <h3 class="text-xl font-bold">Horario de Cocina</h3>
-        <p id="restaurant-hours">${restaurant.hours ? restaurant.hours : defaultHours}</p>
-        <p id="restaurant-weekend-hours">${restaurant.weekendHours ? restaurant.weekendHours : defaultWeekendHours}</p>
-        <h3 class="text-xl font-bold mt-4">Reservas</h3>
-        <p id="restaurant-contact">Teléfono: ${restaurant.contact ? restaurant.contact : defaultContact}</p>
-    `;
+    const menuItems = document.getElementById('menu-items');
+    menuItems.innerHTML = '';
+
+    restaurant.menu.forEach((item, itemIndex) => {
+        const div = document.createElement('div');
+        div.className = 'menu-item bg-white rounded-lg shadow-lg p-4 relative';
+        div.innerHTML = `
+            <img src="${item.image}" alt="${item.name}" class="h-48 w-full object-cover rounded-t-lg">
+            <h3 class="text-xl font-bold mt-2">${item.name}</h3>
+            <p class="text-gray-600">${item.description}</p>
+            <p class="text-lg font-semibold mt-2">${item.price} €</p>
+        `;
+
+        if (isOwner || loggedInUser?.owner === 'admin') {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.innerHTML = '&times;';
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                deleteItem(index, itemIndex);
+            };
+            div.appendChild(deleteBtn);
+        }
+
+        menuItems.appendChild(div);
+    });
 
     if (isOwner || loggedInUser?.owner === 'admin') {
-        const editInfoBtn = document.createElement('button');
-        editInfoBtn.className = 'bg-green-500 text-white p-2 rounded absolute top-2 right-2';
-        editInfoBtn.innerHTML = 'Editar Información';
-        editInfoBtn.onclick = () => editRestaurantInfo(index);
-        restaurantInfo.appendChild(editInfoBtn);
+        document.getElementById('add-item-form').classList.remove('hidden');
+        document.getElementById('add-item-button').onclick = () => addItem(index);
     }
 }
 " alt="${item.name}" class="h-48 w-full object-cover rounded-t-lg">
