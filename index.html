@@ -4,18 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant App</title>
-    <script src="https://cdn.tailwindcss.com">
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        const response = await fetch('/api/restaurants');
-        restaurantData = await response.json();
-        displayRestaurants();
-    } catch (error) {
-        console.error('Error al cargar los restaurantes:', error);
-    }
-});
-</script>
-
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .restaurant-card, .menu-item {
             transition: transform 0.2s;
@@ -136,7 +125,29 @@ document.addEventListener('DOMContentLoaded', async () => {
                     div.appendChild(editImageBtn);
                 }
 
-                restaurantList.appendChild(div);
+                
+                if (loggedInUser && loggedInUser.owner === 'admin') {
+                    // Botón para cambiar el nombre del restaurante
+                    const editNameBtn = document.createElement('button');
+                    editNameBtn.className = 'edit-name-btn';
+                    editNameBtn.innerHTML = '✏️';
+                    editNameBtn.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        changeRestaurantName(index);
+                    });
+                    div.appendChild(editNameBtn);
+
+                    // Botón para cambiar la imagen del restaurante
+                    const editImageBtn = document.createElement('button');
+                    editImageBtn.className = 'edit-image-btn';
+                    editImageBtn.innerHTML = '🖼️';
+                    editImageBtn.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        changeRestaurantImage(index);
+                    });
+                    div.appendChild(editImageBtn);
+                }
+    restaurantList.appendChild(div);
             });
         }
 
@@ -285,3 +296,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     </script>
 </body>
 </html>
+
+<script>
+function changeRestaurantName(index) {
+    const newName = prompt("Ingrese el nuevo nombre del restaurante:");
+    if (newName) {
+        fetch(`/api/restaurants/${index}/name`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: newName })
+        }).then(response => {
+            if (response.ok) {
+                restaurantData[index].name = newName;
+                displayRestaurants();
+            } else {
+                alert('No se pudo actualizar el nombre');
+            }
+        }).catch(error => {
+            console.error('Error al actualizar el nombre:', error);
+        });
+    }
+}
+</script>
