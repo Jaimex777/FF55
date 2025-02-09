@@ -177,14 +177,25 @@
             }
         }
 
-        function displayRestaurants() {
-            const restaurantList = document.getElementById('restaurant-list');
-            restaurantList.innerHTML = '';
-            restaurantData.forEach((restaurant, index) => {
-                const div = document.createElement('div');
-                div.className = 'restaurant-card bg-white rounded-lg shadow-lg cursor-pointer relative';
-                div.innerHTML = `
-                    <div class="h-48 bg-cover bg-center rounded-t-lg" style="background-image: url('${restaurant.image}')"></div>
+        
+function displayRestaurants() {
+    const restaurantList = document.getElementById('restaurant-list');
+    restaurantList.innerHTML = '';
+    document.getElementById('app-title').classList.remove('hidden');
+
+    restaurantData.forEach((restaurant, index) => {
+        const div = document.createElement('div');
+        div.className = 'restaurant-card bg-white rounded-lg shadow-lg cursor-pointer relative';
+        div.innerHTML = `
+            <div class="h-48 bg-cover bg-center rounded-t-lg" style="background-image: url('${restaurant.image || 'https://via.placeholder.com/150'}')"></div>
+            <div class="p-4 text-center font-bold text-xl">${restaurant.name || 'Restaurante Sin Nombre'}</div>
+        `;
+        div.onclick = () => showMenu(index, loggedInUser && (loggedInUser.owner === 'admin' || loggedInUser.owner === restaurant.owner));
+
+        restaurantList.appendChild(div);
+    });
+}
+')"></div>
                     <div class="p-4 text-center font-bold text-xl">${restaurant.name}</div>
                 `;
                 div.onclick = () => {
