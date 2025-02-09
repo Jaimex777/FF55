@@ -145,7 +145,6 @@
                             restaurantData[index].image = imageUrl;
                             displayRestaurants();
                         } else {
-
                             alert('No se pudo actualizar la imagen');
                         }
                     };
@@ -170,6 +169,51 @@
             .catch(error => {
                 console.error('Error al eliminar el producto:', error);
             });
+        }
+
+        function addItem(restaurantIndex) {
+            const name = document.getElementById('new-item-name').value;
+            const description = document.getElementById('new-item-description').value;
+            const price = document.getElementById('new-item-price').value;
+            const imageInput = document.getElementById('new-item-image').files[0];
+
+            if (!name || !description || !price) {
+                alert('Por favor, completa todos los campos.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const newItem = {
+                    name: name,
+                    description: description,
+                    price: price,
+                    image: imageInput ? e.target.result : ''
+                };
+
+                fetch(`/api/restaurants/${restaurantIndex}/menu`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newItem)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        restaurantData[restaurantIndex].menu.push(newItem);
+                        showMenu(restaurantIndex, true);
+                    } else {
+                        alert('No se pudo agregar el plato.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al agregar el plato:', error);
+                });
+            };
+
+            if (imageInput) {
+                reader.readAsDataURL(imageInput);
+            } else {
+                reader.onload();
+            }
         }
 
         function showMenu(index, isOwner) {
