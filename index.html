@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,6 +41,16 @@
             <button id="back-button" class="mb-4 px-4 py-2 bg-blue-500 text-white rounded">Volver a Restaurantes</button>
             <h2 id="menu-title" class="text-3xl font-bold mb-4"></h2>
             <div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+            <!-- Formulario para agregar nuevos platos (solo visible para propietarios) -->
+            <div id="add-item-form" class="hidden mt-6 bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-2xl font-bold mb-4">Agregar Nuevo Plato</h3>
+                <input id="new-item-name" type="text" placeholder="Nombre del plato" class="w-full p-2 mb-2 border rounded">
+                <input id="new-item-description" type="text" placeholder="Descripción" class="w-full p-2 mb-2 border rounded">
+                <input id="new-item-price" type="text" placeholder="Precio" class="w-full p-2 mb-2 border rounded">
+                <input id="new-item-image" type="file" accept="image/*" class="w-full p-2 mb-4 border rounded">
+                <button id="add-item-button" class="w-full bg-green-500 text-white p-2 rounded">Agregar Plato</button>
+            </div>
         </div>
     </div>
 
@@ -73,8 +82,8 @@
 
             if (restaurant) {
                 loggedInRestaurant = restaurant;
-                showMenu(restaurantData.indexOf(restaurant), true);
                 document.getElementById('login-section').classList.add('hidden');
+                showMenu(restaurantData.indexOf(restaurant), true);
             } else {
                 alert('Usuario o contraseña incorrectos');
             }
@@ -123,6 +132,12 @@
 
                 menuItems.appendChild(div);
             });
+
+            // Mostrar formulario para agregar platos si es propietario
+            if (isOwner) {
+                document.getElementById('add-item-form').classList.remove('hidden');
+                document.getElementById('add-item-button').onclick = () => addItem(index);
+            }
         }
 
         async function deleteItem(restaurantIndex, itemIndex) {
@@ -138,12 +153,50 @@
             }
         }
 
+        async function addItem(restaurantIndex) {
+            const name = document.getElementById('new-item-name').value;
+            const description = document.getElementById('new-item-description').value;
+            const price = document.getElementById('new-item-price').value;
+            const imageFile = document.getElementById('new-item-image').files[0];
+
+            let imageUrl = 'https://via.placeholder.com/300x200?text=Sin+Imagen';
+
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = async function(event) {
+                    imageUrl = event.target.result;
+                    await saveNewItem(restaurantIndex, name, description, price, imageUrl);
+                };
+                reader.readAsDataURL(imageFile);
+            } else {
+                await saveNewItem(restaurantIndex, name, description, price, imageUrl);
+            }
+        }
+
+        async function saveNewItem(restaurantIndex, name, description, price, imageUrl) {
+            const newItem = { name, description, price, image: imageUrl };
+
+            const response = await fetch(`/api/restaurants/${restaurantIndex}/menu`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newItem)
+            });
+
+            if (response.ok) {
+                restaurantData[restaurantIndex].menu.push(newItem);
+                showMenu(restaurantIndex, true);
+            } else {
+                alert('No se pudo agregar el producto');
+            }
+        }
+
         document.getElementById('login-button').addEventListener('click', login);
 
         document.getElementById('back-button').addEventListener('click', () => {
             loggedInRestaurant = null;
             document.getElementById('menu').classList.add('hidden');
             document.getElementById('restaurant-list').classList.remove('hidden');
+            document.getElementById('add-item-form').classList.add('hidden');
             displayRestaurants();
         });
 
