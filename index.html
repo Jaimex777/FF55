@@ -4,7 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant App</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com">
+        function enableAdminTitleEdit() {
+            const appTitle = document.getElementById('app-title');
+            appTitle.addEventListener('click', () => {
+                const newTitle = prompt("Ingrese el nuevo nombre para la aplicación:", appTitle.textContent);
+                if (newTitle) {
+                    appTitle.textContent = newTitle;
+                }
+            });
+        }
+    
+</script>
     <style>
         .restaurant-card, .menu-item {
             transition: transform 0.2s;
@@ -49,7 +60,7 @@
                 <h3 class="text-2xl font-bold mb-4">Agregar Nuevo Plato</h3>
                 <input id="new-item-name" type="text" placeholder="Nombre del plato" class="w-full p-2 mb-2 border rounded">
                 <input id="new-item-description" type="text" placeholder="Descripción" class="w-full p-2 mb-2 border rounded">
-                <input id="new-item-price" type="text" pattern="[0-9.,]*" placeholder="Precio" class="w-full p-2 mb-2 border rounded">
+                <input id="new-item-price" type="text" placeholder="Precio" class="w-full p-2 mb-2 border rounded">
                 <input id="new-item-image" type="file" accept="image/*" class="w-full p-2 mb-4 border rounded">
                 <button id="add-item-button" class="w-full bg-green-500 text-white p-2 rounded">Agregar Plato</button>
             </div>
@@ -77,27 +88,12 @@
             }
         }
 
-        
         function login() {
-            if (document.getElementById('username').value === 'admin' && document.getElementById('password').value === 'admin123') {
-                enableAdminTitleEdit();
-            }
-        }
-
-        function enableAdminTitleEdit() {
-            const appTitle = document.getElementById('app-title');
-            appTitle.addEventListener('click', () => {
-                const newTitle = prompt("Ingrese el nuevo nombre para la aplicación:", appTitle.textContent);
-                if (newTitle) {
-                    appTitle.textContent = newTitle;
-                }
-            });
-        }
-        
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
             if (username === 'admin' && password === 'admin123') {
+                enableAdminTitleEdit();
                 loggedInUser = { owner: 'admin' };
                 document.getElementById('login-section').classList.add('hidden');
                 displayRestaurants();
@@ -273,7 +269,7 @@
                     <img src="${item.image}" alt="${item.name}" class="h-48 w-full object-cover rounded-t-lg">
                     <h3 class="text-xl font-bold mt-2">${item.name}</h3>
                     <p class="text-gray-600">${item.description}</p>
-                    <p class="text-lg font-semibold mt-2">${item.price} €</p>
+                    <p class="text-lg font-semibold mt-2">${item.price}</p>
                 `;
 
                 if (isOwner) {
@@ -309,7 +305,18 @@
         });
 
         fetchRestaurants();
-    </script>
+    
+        function enableAdminTitleEdit() {
+            const appTitle = document.getElementById('app-title');
+            appTitle.addEventListener('click', () => {
+                const newTitle = prompt("Ingrese el nuevo nombre para la aplicación:", appTitle.textContent);
+                if (newTitle) {
+                    appTitle.textContent = newTitle;
+                }
+            });
+        }
+    
+</script>
 </body>
 </html>
 
@@ -333,4 +340,15 @@ function changeRestaurantName(index) {
         });
     }
 }
+
+        function enableAdminTitleEdit() {
+            const appTitle = document.getElementById('app-title');
+            appTitle.addEventListener('click', () => {
+                const newTitle = prompt("Ingrese el nuevo nombre para la aplicación:", appTitle.textContent);
+                if (newTitle) {
+                    appTitle.textContent = newTitle;
+                }
+            });
+        }
+    
 </script>
