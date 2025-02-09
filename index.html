@@ -49,7 +49,7 @@
                 <h3 class="text-2xl font-bold mb-4">Agregar Nuevo Plato</h3>
                 <input id="new-item-name" type="text" placeholder="Nombre del plato" class="w-full p-2 mb-2 border rounded">
                 <input id="new-item-description" type="text" placeholder="Descripción" class="w-full p-2 mb-2 border rounded">
-                <input id="new-item-price" type="text" placeholder="Precio" class="w-full p-2 mb-2 border rounded">
+                <input id="new-item-price" type="text" pattern="[0-9.,]*" placeholder="Precio" class="w-full p-2 mb-2 border rounded">
                 <input id="new-item-image" type="file" accept="image/*" class="w-full p-2 mb-4 border rounded">
                 <button id="add-item-button" class="w-full bg-green-500 text-white p-2 rounded">Agregar Plato</button>
             </div>
@@ -257,7 +257,7 @@
                     <img src="${item.image}" alt="${item.name}" class="h-48 w-full object-cover rounded-t-lg">
                     <h3 class="text-xl font-bold mt-2">${item.name}</h3>
                     <p class="text-gray-600">${item.description}</p>
-                    <p class="text-lg font-semibold mt-2">${item.price}</p>
+                    <p class="text-lg font-semibold mt-2">${item.price} €</p>
                 `;
 
                 if (isOwner) {
