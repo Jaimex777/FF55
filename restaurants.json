@@ -1,37 +1,38 @@
-
 [
     {
         "id": 1,
         "name": "Restaurante A",
         "menu": [
             {
-                "name": "Plato 1",
-                "description": "Delicioso plato 1",
-                "price": 10.50,
+                "name": "Ensalada César",
+                "description": "Ensalada fresca con aderezo César y pollo",
+                "price": 10.99,
                 "image": "data:image/png;base64,iVBORw0KGgo..."
             },
             {
-                "name": "Plato 2",
-                "description": "Sabroso plato 2",
-                "price": 12.30,
+                "name": "Pizza Margarita",
+                "description": "Clásica pizza con queso mozzarella y albahaca",
+                "price": 12.99,
                 "image": "data:image/png;base64,iVBORw0KGgo..."
             }
-        ],
-        "owner": "propietarioA",
-        "password": "passwordA"
+        ]
     },
     {
         "id": 2,
         "name": "Restaurante B",
         "menu": [
             {
-                "name": "Plato 3",
-                "description": "Delicioso plato 3",
-                "price": 9.90,
+                "name": "Sopa de Tomate",
+                "description": "Sopa cremosa de tomate con albahaca",
+                "price": 7.99,
+                "image": "data:image/png;base64,iVBORw0KGgo..."
+            },
+            {
+                "name": "Pasta Alfredo",
+                "description": "Pasta con salsa cremosa Alfredo",
+                "price": 14.99,
                 "image": "data:image/png;base64,iVBORw0KGgo..."
             }
-        ],
-        "owner": "propietarioB",
-        "password": "passwordB"
+        ]
     }
 ]
