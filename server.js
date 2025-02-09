@@ -1,4 +1,3 @@
-
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -8,22 +7,24 @@ const PORT = process.env.PORT || 3000;
 const dataPath = path.join(__dirname, 'restaurants.json');
 
 app.use(express.json());
+app.use(express.static(__dirname));
 
-// Servir archivos estáticos de la raíz
-app.use('/', express.static(path.join(__dirname)));
+// Servir index.html en la raíz
+app.get('/', (req, res) => {
+    res.sendFile(path.resolve('index.html'));
+});
 
-// Rutas API
+// Obtener todos los restaurantes
 app.get('/api/restaurants', (req, res) => {
-    console.log('GET /api/restaurants llamado');
     fs.readFile(dataPath, 'utf8', (err, data) => {
         if (err) return res.status(500).send('Error al leer los datos');
         res.json(JSON.parse(data));
     });
 });
 
+// Eliminar un producto del menú
 app.delete('/api/restaurants/:restaurantIndex/menu/:itemIndex', (req, res) => {
     const { restaurantIndex, itemIndex } = req.params;
-    console.log(`DELETE /api/restaurants/${restaurantIndex}/menu/${itemIndex} llamado`);
 
     fs.readFile(dataPath, 'utf8', (err, data) => {
         if (err) return res.status(500).send('Error al leer los datos');
@@ -43,11 +44,32 @@ app.delete('/api/restaurants/:restaurantIndex/menu/:itemIndex', (req, res) => {
     });
 });
 
+// Agregar un nuevo producto al menú
+app.post('/api/restaurants/:restaurantIndex/menu', (req, res) => {
+    const { restaurantIndex } = req.params;
+    const newItem = req.body;
+
+    fs.readFile(dataPath, 'utf8', (err, data) => {
+        if (err) return res.status(500).send('Error al leer los datos');
+
+        let restaurants = JSON.parse(data);
+
+        if (restaurants[restaurantIndex]) {
+            restaurants[restaurantIndex].menu.push(newItem);
+
+            fs.writeFile(dataPath, JSON.stringify(restaurants, null, 2), err => {
+                if (err) return res.status(500).send('Error al guardar los cambios');
+                res.send('Producto agregado correctamente');
+            });
+        } else {
+            res.status(404).send('Restaurante no encontrado');
+        }
+    });
+});
+
 // Ruta comodín para cualquier otra solicitud
 app.get('*', (req, res) => {
-    console.log(`Ruta desconocida llamada: ${req.originalUrl}`);
-    res.setHeader('Content-Type', 'text/html');
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.resolve('index.html'));
 });
 
 app.listen(PORT, () => {
