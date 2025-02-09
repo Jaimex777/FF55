@@ -1,80 +1,37 @@
+
 [
-  {
-    "name": "Restaurante Italiano",
-    "image": "https://via.placeholder.com/300x200?text=Italiano",
-    "owner": "italiano",
-    "password": "1234",
-    "menu": [
-      {
-        "name": "Pasta Carbonara",
-        "image": "https://via.placeholder.com/300x200?text=Carbonara",
-        "description": "Pasta con salsa de huevo y panceta.",
-        "price": "12€"
-      },
-      {
-        "name": "Pizza Margherita",
-        "image": "https://via.placeholder.com/300x200?text=Margherita",
-        "description": "Pizza con tomate, mozzarella y albahaca.",
-        "price": "10€"
-      },
-      {
-        "name": "Tiramisú",
-        "image": "https://via.placeholder.com/300x200?text=Tiramisú",
-        "description": "Postre de café y mascarpone.",
-        "price": "6€"
-      }
-    ]
-  },
-  {
-    "name": "Restaurante Japonés",
-    "image": "https://via.placeholder.com/300x200?text=Japonés",
-    "owner": "japones",
-    "password": "5678",
-    "menu": [
-      {
-        "name": "Sushi Variado",
-        "image": "https://via.placeholder.com/300x200?text=Sushi",
-        "description": "Selección de sushi fresco.",
-        "price": "15€"
-      },
-      {
-        "name": "Ramen",
-        "image": "https://via.placeholder.com/300x200?text=Ramen",
-        "description": "Sopa de fideos con carne y huevo.",
-        "price": "13€"
-      },
-      {
-        "name": "Mochi",
-        "image": "https://via.placeholder.com/300x200?text=Mochi",
-        "description": "Dulce de arroz relleno.",
-        "price": "5€"
-      }
-    ]
-  },
-  {
-    "name": "Restaurante Mexicano",
-    "image": "https://via.placeholder.com/300x200?text=Mexicano",
-    "owner": "mexicano",
-    "password": "abcd",
-    "menu": [
-      {
-        "name": "Tacos al Pastor",
-        "image": "https://via.placeholder.com/300x200?text=Tacos",
-        "description": "Tacos de cerdo marinados.",
-        "price": "8€"
-      },
-      {
-        "name": "Guacamole",
-        "image": "https://via.placeholder.com/300x200?text=Guacamole",
-        "description": "Dip de aguacate fresco.",
-        "price": "6€"
-      },
-      {
-        "name": "Churros",
-        "image": "https://via.placeholder.com/300x200?text=Churros",
-        "description": "Postre frito con azúcar.",
-        "price": "4€"
-      }
-    ]
-  }
+    {
+        "id": 1,
+        "name": "Restaurante A",
+        "menu": [
+            {
+                "name": "Plato 1",
+                "description": "Delicioso plato 1",
+                "price": 10.50,
+                "image": "data:image/png;base64,iVBORw0KGgo..."
+            },
+            {
+                "name": "Plato 2",
+                "description": "Sabroso plato 2",
+                "price": 12.30,
+                "image": "data:image/png;base64,iVBORw0KGgo..."
+            }
+        ],
+        "owner": "propietarioA",
+        "password": "passwordA"
+    },
+    {
+        "id": 2,
+        "name": "Restaurante B",
+        "menu": [
+            {
+                "name": "Plato 3",
+                "description": "Delicioso plato 3",
+                "price": 9.90,
+                "image": "data:image/png;base64,iVBORw0KGgo..."
+            }
+        ],
+        "owner": "propietarioB",
+        "password": "passwordB"
+    }
 ]
