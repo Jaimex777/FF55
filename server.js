@@ -50,6 +50,31 @@ app.put('/api/restaurants/:restaurantIndex/image', async (req, res) => {
   }
 });
 
+// Ruta para actualizar el nombre del restaurante
+app.put('/api/restaurants/:restaurantIndex/name', async (req, res) => {
+  const { restaurantIndex } = req.params;
+  const { name } = req.body;
+
+  let restaurants = require('./restaurants.json');
+  const restIdx = parseInt(restaurantIndex);
+
+  if (restaurants[restIdx]) {
+      restaurants[restIdx].name = name;
+      fs.writeFileSync('restaurants.json', JSON.stringify(restaurants, null, 2), 'utf8');
+
+      // Subir los cambios a GitHub
+      try {
+          await commitChanges('restaurants.json', JSON.stringify(restaurants), 'Actualizar nombre del restaurante');
+          res.status(200).send({ message: 'Nombre del restaurante actualizado exitosamente' });
+      } catch (error) {
+          console.error('Error subiendo cambios a GitHub:', error.response ? error.response.data : error.message);
+          res.status(500).send({ message: 'Nombre actualizado, pero no se pudo guardar en GitHub' });
+      }
+  } else {
+      res.status(404).send({ message: 'Restaurante no encontrado' });
+  }
+});
+
 // Ruta para agregar un nuevo plato al menú y subir cambios a GitHub
 app.post('/api/restaurants/:restaurantIndex/menu', async (req, res) => {
   const { restaurantIndex } = req.params;
