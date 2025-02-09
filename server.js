@@ -6,6 +6,13 @@ const axios = require('axios');
 const app = express();
 app.use(express.json());
 
+const path = require('path');
+
+// Ruta para servir el archivo index.html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // Ruta para manejar cambios en los productos
 app.post('/update-products', async (req, res) => {
   const { newData } = req.body;
