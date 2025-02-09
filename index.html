@@ -25,6 +25,61 @@
             });
         }
     
+
+    function editRestaurantInfo(index) {
+        const newHours = prompt("Ingrese el horario de lunes a viernes:", restaurantData[index].hours || 'Lunes a Viernes: 12:00 - 22:00');
+        const newWeekendHours = prompt("Ingrese el horario de fines de semana:", restaurantData[index].weekendHours || 'Sábados y Domingos: 13:00 - 23:00');
+        const newContact = prompt("Ingrese el teléfono de contacto:", restaurantData[index].contact || '123-456-789');
+
+        if (newHours && newWeekendHours && newContact) {
+            restaurantData[index].hours = newHours;
+            restaurantData[index].weekendHours = newWeekendHours;
+            restaurantData[index].contact = newContact;
+
+            fetch(`/api/restaurants/${index}/info`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ hours: newHours, weekendHours: newWeekendHours, contact: newContact })
+            }).then(response => {
+                if (response.ok) {
+                    showMenu(index, true);
+                } else {
+                    alert('No se pudo actualizar la información del restaurante');
+                }
+            }).catch(error => {
+                console.error('Error al actualizar la información:', error);
+            });
+        }
+    }
+    
+
+    function saveAppTitle(newTitle) {
+        fetch('/api/app-title', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: newTitle })
+        }).catch(error => console.error('Error guardando el título de la app:', error));
+    }
+
+    function enableAdminTitleEdit() {
+        const appTitle = document.getElementById('app-title');
+        appTitle.addEventListener('click', () => {
+            const newTitle = prompt("Ingrese el nuevo nombre para la aplicación:", appTitle.textContent);
+            if (newTitle) {
+                appTitle.textContent = newTitle;
+                saveAppTitle(newTitle);
+            }
+        });
+
+        fetch('/api/app-title')
+            .then(response => response.json())
+            .then(data => {
+                if (data.title) {
+                    appTitle.textContent = data.title;
+                }
+            });
+    }
+    
 </script>
     <style>
         .restaurant-card, .menu-item {
@@ -65,7 +120,8 @@
         <div id="menu" class="hidden">
             <button id="back-button" class="mb-4 px-4 py-2 bg-blue-500 text-white rounded">Volver a Restaurantes</button>
             <h2 id="menu-title" class="text-3xl font-bold mb-4"></h2>
-            <div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <div id="restaurant-info" class="bg-white p-4 rounded-lg shadow-lg mb-6 relative"></div>
+    <div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             <div id="add-item-form" class="hidden mt-6 bg-white p-6 rounded-lg shadow-lg">
                 <h3 class="text-2xl font-bold mb-4">Agregar Nuevo Plato</h3>
                 <input id="new-item-name" type="text" placeholder="Nombre del plato" class="w-full p-2 mb-2 border rounded">
@@ -336,6 +392,61 @@
             });
         }
     
+
+    function editRestaurantInfo(index) {
+        const newHours = prompt("Ingrese el horario de lunes a viernes:", restaurantData[index].hours || 'Lunes a Viernes: 12:00 - 22:00');
+        const newWeekendHours = prompt("Ingrese el horario de fines de semana:", restaurantData[index].weekendHours || 'Sábados y Domingos: 13:00 - 23:00');
+        const newContact = prompt("Ingrese el teléfono de contacto:", restaurantData[index].contact || '123-456-789');
+
+        if (newHours && newWeekendHours && newContact) {
+            restaurantData[index].hours = newHours;
+            restaurantData[index].weekendHours = newWeekendHours;
+            restaurantData[index].contact = newContact;
+
+            fetch(`/api/restaurants/${index}/info`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ hours: newHours, weekendHours: newWeekendHours, contact: newContact })
+            }).then(response => {
+                if (response.ok) {
+                    showMenu(index, true);
+                } else {
+                    alert('No se pudo actualizar la información del restaurante');
+                }
+            }).catch(error => {
+                console.error('Error al actualizar la información:', error);
+            });
+        }
+    }
+    
+
+    function saveAppTitle(newTitle) {
+        fetch('/api/app-title', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: newTitle })
+        }).catch(error => console.error('Error guardando el título de la app:', error));
+    }
+
+    function enableAdminTitleEdit() {
+        const appTitle = document.getElementById('app-title');
+        appTitle.addEventListener('click', () => {
+            const newTitle = prompt("Ingrese el nuevo nombre para la aplicación:", appTitle.textContent);
+            if (newTitle) {
+                appTitle.textContent = newTitle;
+                saveAppTitle(newTitle);
+            }
+        });
+
+        fetch('/api/app-title')
+            .then(response => response.json())
+            .then(data => {
+                if (data.title) {
+                    appTitle.textContent = data.title;
+                }
+            });
+    }
+    
 </script>
 </body>
 </html>
@@ -380,5 +491,60 @@ function changeRestaurantName(index) {
                 }
             });
         }
+    
+
+    function editRestaurantInfo(index) {
+        const newHours = prompt("Ingrese el horario de lunes a viernes:", restaurantData[index].hours || 'Lunes a Viernes: 12:00 - 22:00');
+        const newWeekendHours = prompt("Ingrese el horario de fines de semana:", restaurantData[index].weekendHours || 'Sábados y Domingos: 13:00 - 23:00');
+        const newContact = prompt("Ingrese el teléfono de contacto:", restaurantData[index].contact || '123-456-789');
+
+        if (newHours && newWeekendHours && newContact) {
+            restaurantData[index].hours = newHours;
+            restaurantData[index].weekendHours = newWeekendHours;
+            restaurantData[index].contact = newContact;
+
+            fetch(`/api/restaurants/${index}/info`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ hours: newHours, weekendHours: newWeekendHours, contact: newContact })
+            }).then(response => {
+                if (response.ok) {
+                    showMenu(index, true);
+                } else {
+                    alert('No se pudo actualizar la información del restaurante');
+                }
+            }).catch(error => {
+                console.error('Error al actualizar la información:', error);
+            });
+        }
+    }
+    
+
+    function saveAppTitle(newTitle) {
+        fetch('/api/app-title', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: newTitle })
+        }).catch(error => console.error('Error guardando el título de la app:', error));
+    }
+
+    function enableAdminTitleEdit() {
+        const appTitle = document.getElementById('app-title');
+        appTitle.addEventListener('click', () => {
+            const newTitle = prompt("Ingrese el nuevo nombre para la aplicación:", appTitle.textContent);
+            if (newTitle) {
+                appTitle.textContent = newTitle;
+                saveAppTitle(newTitle);
+            }
+        });
+
+        fetch('/api/app-title')
+            .then(response => response.json())
+            .then(data => {
+                if (data.title) {
+                    appTitle.textContent = data.title;
+                }
+            });
+    }
     
 </script>
