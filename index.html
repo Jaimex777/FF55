@@ -45,6 +45,138 @@
     </style>
 </head>
 <body class="bg-gray-100">
-    <!-- Rest of the content remains the same --> 
+    <div id="app" class="p-6">
+        <h1 class="text-4xl font-bold text-center mb-8">Restaurantes</h1>
+        <div id="restaurant-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        <div id="menu" class="hidden">
+            <button id="back-button" class="mb-4 px-4 py-2 bg-blue-500 text-white rounded">Volver a Restaurantes</button>
+            <h2 id="menu-title" class="text-3xl font-bold mb-4"></h2>
+            <div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <div id="add-item-form" class="hidden mt-6 bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-2xl font-bold mb-4">Agregar Nuevo Plato</h3>
+                <input id="new-item-name" type="text" placeholder="Nombre del plato" class="w-full p-2 mb-2 border rounded">
+                <input id="new-item-description" type="text" placeholder="Descripción" class="w-full p-2 mb-2 border rounded">
+                <input id="new-item-price" type="text" placeholder="Precio" class="w-full p-2 mb-2 border rounded">
+                <input id="new-item-image" type="file" accept="image/*" class="w-full p-2 mb-4 border rounded">
+                <button id="add-item-button" class="w-full bg-green-500 text-white p-2 rounded">Agregar Plato</button>
+            </div>
+        </div>
+    </div>
+    <footer id="login-section" class="bg-white p-6 shadow-inner mt-10">
+        <div class="max-w-sm mx-auto">
+            <h2 class="text-xl font-bold mb-4 text-center">Login de Propietarios</h2>
+            <input id="username" type="text" placeholder="Usuario" class="w-full p-2 mb-2 border rounded">
+            <input id="password" type="password" placeholder="Contraseña" class="w-full p-2 mb-4 border rounded">
+            <button id="login-button" class="w-full bg-blue-500 text-white p-2 rounded">Iniciar Sesión</button>
+        </div>
+    </footer>
+    <script>
+        let restaurantData = [];
+        let loggedInUser = null;
+
+        async function fetchRestaurants() {
+            try {
+                const response = await fetch('/api/restaurants');
+                restaurantData = await response.json();
+                displayRestaurants();
+            } catch (error) {
+                console.error('Error al cargar los restaurantes:', error);
+            }
+        }
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === 'admin' && password === 'admin123') {
+                loggedInUser = { owner: 'admin' };
+                document.getElementById('login-section').classList.add('hidden');
+                displayRestaurants();
+                return;
+            }
+
+            const user = restaurantData.find(r => r.owner === username && r.password === password);
+
+            if (user) {
+                loggedInUser = user;
+                document.getElementById('login-section').classList.add('hidden');
+                showMenu(restaurantData.indexOf(user), true);
+            } else {
+                alert('Usuario o contraseña incorrectos');
+            }
+        }
+
+        function displayRestaurants() {
+            const restaurantList = document.getElementById('restaurant-list');
+            restaurantList.innerHTML = '';
+            restaurantData.forEach((restaurant, index) => {
+                const div = document.createElement('div');
+                div.className = 'restaurant-card bg-white rounded-lg shadow-lg cursor-pointer relative';
+                div.innerHTML = `
+                    <div class="h-48 bg-cover bg-center rounded-t-lg" style="background-image: url('${restaurant.image}')"></div>
+                    <div class="p-4 text-center font-bold text-xl">${restaurant.name}</div>
+                `;
+                div.onclick = () => showMenu(index, loggedInUser && (loggedInUser.owner === 'admin' || loggedInUser.owner === restaurant.owner));
+
+                if (loggedInUser && loggedInUser.owner === 'admin') {
+                    const editImageBtn = document.createElement('button');
+                    editImageBtn.className = 'edit-image-btn';
+                    editImageBtn.innerHTML = '&#9998;';
+                    editImageBtn.onclick = (event) => {
+                        event.stopPropagation();
+                        changeRestaurantImage(index);
+                    };
+                    div.appendChild(editImageBtn);
+                }
+
+                restaurantList.appendChild(div);
+            });
+        }
+
+        function showMenu(index, isOwner) {
+            document.getElementById('restaurant-list').classList.add('hidden');
+            document.getElementById('menu').classList.remove('hidden');
+
+            const restaurant = restaurantData[index];
+            document.getElementById('menu-title').textContent = restaurant.name;
+            const menuItems = document.getElementById('menu-items');
+            menuItems.innerHTML = '';
+
+            restaurant.menu.forEach((item, itemIndex) => {
+                const div = document.createElement('div');
+                div.className = 'menu-item bg-white rounded-lg shadow-lg p-4 relative';
+                div.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" class="h-48 w-full object-cover rounded-t-lg">
+                    <h3 class="text-xl font-bold mt-2">${item.name}</h3>
+                    <p class="text-gray-600">${item.description}</p>
+                    <p class="text-lg font-semibold mt-2">${item.price}</p>
+                `;
+
+                if (isOwner) {
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.innerHTML = '&times;';
+                    deleteBtn.onclick = () => deleteItem(index, itemIndex);
+                    div.appendChild(deleteBtn);
+                }
+
+                menuItems.appendChild(div);
+            });
+
+            if (isOwner) {
+                document.getElementById('add-item-form').classList.remove('hidden');
+                document.getElementById('add-item-button').onclick = () => addItem(index);
+            }
+        }
+
+        document.getElementById('login-button').addEventListener('click', login);
+
+        document.getElementById('back-button').addEventListener('click', () => {
+            document.getElementById('menu').classList.add('hidden');
+            document.getElementById('restaurant-list').classList.remove('hidden');
+        });
+
+        fetchRestaurants();
+    </script>
 </body>
 </html>
