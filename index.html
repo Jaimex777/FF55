@@ -109,7 +109,13 @@
                     <div class="h-48 bg-cover bg-center rounded-t-lg" style="background-image: url('${restaurant.image}')"></div>
                     <div class="p-4 text-center font-bold text-xl">${restaurant.name}</div>
                 `;
-                div.onclick = () => showMenu(index, loggedInUser && (loggedInUser.owner === 'admin' || loggedInUser.owner === restaurant.owner));
+                div.onclick = () => {
+                    if (loggedInUser || restaurant.public) {
+                        showMenu(index, loggedInUser && (loggedInUser.owner === 'admin' || loggedInUser.owner === restaurant.owner));
+                    } else {
+                        alert('Debe iniciar sesión para acceder al menú.');
+                    }
+                };
 
                 if (loggedInUser && loggedInUser.owner === 'admin') {
                     const editImageBtn = document.createElement('button');
@@ -252,6 +258,8 @@
             if (isOwner) {
                 document.getElementById('add-item-form').classList.remove('hidden');
                 document.getElementById('add-item-button').onclick = () => addItem(index);
+            } else {
+                document.getElementById('add-item-form').classList.add('hidden');
             }
         }
 
@@ -260,6 +268,9 @@
         document.getElementById('back-button').addEventListener('click', () => {
             document.getElementById('menu').classList.add('hidden');
             document.getElementById('restaurant-list').classList.remove('hidden');
+            if (!loggedInUser) {
+                document.getElementById('login-section').classList.remove('hidden');
+            }
         });
 
         fetchRestaurants();
