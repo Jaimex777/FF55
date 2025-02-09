@@ -12,10 +12,9 @@
         .restaurant-card:hover, .menu-item:hover {
             transform: scale(1.05);
         }
-        .delete-btn {
+        .delete-btn, .edit-image-btn {
             position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
+            z-index: 10;
             background-color: red;
             color: white;
             border: none;
@@ -26,23 +25,15 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            z-index: 10;
+        }
+        .delete-btn {
+            top: 0.5rem;
+            right: 0.5rem;
         }
         .edit-image-btn {
-            position: absolute;
             bottom: 0.5rem;
             right: 0.5rem;
             background-color: blue;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 10;
         }
     </style>
 </head>
@@ -139,7 +130,7 @@
             const fileInput = document.createElement('input');
             fileInput.type = 'file';
             fileInput.accept = 'image/*';
-            fileInput.onchange = async function(event) {
+            fileInput.addEventListener('change', async (event) => {
                 const file = event.target.files[0];
                 if (file) {
                     const reader = new FileReader();
@@ -159,7 +150,7 @@
                     };
                     reader.readAsDataURL(file);
                 }
-            };
+            });
             fileInput.click();
         }
 
