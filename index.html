@@ -47,17 +47,11 @@
 <body class="bg-gray-100">
     <div id="app" class="p-6">
         <h1 class="text-4xl font-bold text-center mb-8">Restaurantes</h1>
-
-        <!-- Restaurant List -->
         <div id="restaurant-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-
-        <!-- Menu Section -->
         <div id="menu" class="hidden">
             <button id="back-button" class="mb-4 px-4 py-2 bg-blue-500 text-white rounded">Volver a Restaurantes</button>
             <h2 id="menu-title" class="text-3xl font-bold mb-4"></h2>
             <div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-
-            <!-- Formulario para agregar nuevos platos (solo visible para propietarios) -->
             <div id="add-item-form" class="hidden mt-6 bg-white p-6 rounded-lg shadow-lg">
                 <h3 class="text-2xl font-bold mb-4">Agregar Nuevo Plato</h3>
                 <input id="new-item-name" type="text" placeholder="Nombre del plato" class="w-full p-2 mb-2 border rounded">
@@ -68,8 +62,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Login Section al final de la página -->
     <footer id="login-section" class="bg-white p-6 shadow-inner mt-10">
         <div class="max-w-sm mx-auto">
             <h2 class="text-xl font-bold mb-4 text-center">Login de Propietarios</h2>
@@ -78,7 +70,6 @@
             <button id="login-button" class="w-full bg-blue-500 text-white p-2 rounded">Iniciar Sesión</button>
         </div>
     </footer>
-
     <script>
         let restaurantData = [];
         let loggedInUser = null;
@@ -93,16 +84,19 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
+            if (username === 'admin' && password === 'admin123') {
+                loggedInUser = { owner: 'admin' };
+                document.getElementById('login-section').classList.add('hidden');
+                displayRestaurants();
+                return;
+            }
+
             const user = restaurantData.find(r => r.owner === username && r.password === password);
 
             if (user) {
                 loggedInUser = user;
                 document.getElementById('login-section').classList.add('hidden');
-                if (user.owner === 'admin') {
-                    displayRestaurants();
-                } else {
-                    showMenu(restaurantData.indexOf(user), true);
-                }
+                showMenu(restaurantData.indexOf(user), true);
             } else {
                 alert('Usuario o contraseña incorrectos');
             }
@@ -120,7 +114,6 @@
                 `;
                 div.onclick = () => showMenu(index, loggedInUser && (loggedInUser.owner === 'admin' || loggedInUser.owner === restaurant.owner));
 
-                // Si el usuario es administrador, mostrar botón para cambiar la imagen
                 if (loggedInUser && loggedInUser.owner === 'admin') {
                     const editImageBtn = document.createElement('button');
                     editImageBtn.className = 'edit-image-btn';
