@@ -6,7 +6,8 @@ const PORT = process.env.PORT || 3000;
 
 const dataPath = path.join(__dirname, 'restaurants.json');
 
-app.use(express.json());
+// Aumentar el límite del tamaño de las solicitudes a 10MB
+app.use(express.json({ limit: '10mb' }));
 app.use(express.static(__dirname));
 
 // Servir index.html en la raíz
