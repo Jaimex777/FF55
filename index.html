@@ -109,13 +109,7 @@
                     <div class="h-48 bg-cover bg-center rounded-t-lg" style="background-image: url('${restaurant.image}')"></div>
                     <div class="p-4 text-center font-bold text-xl">${restaurant.name}</div>
                 `;
-                div.onclick = () => {
-                    if (loggedInUser || restaurant.public) {
-                        showMenu(index, loggedInUser && (loggedInUser.owner === 'admin' || loggedInUser.owner === restaurant.owner));
-                    } else {
-                        alert('Debe iniciar sesión para acceder al menú.');
-                    }
-                };
+                div.onclick = () => showMenu(index, loggedInUser && (loggedInUser.owner === 'admin' || loggedInUser.owner === restaurant.owner));
 
                 if (loggedInUser && loggedInUser.owner === 'admin') {
                     const editImageBtn = document.createElement('button');
