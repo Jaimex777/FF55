@@ -39,7 +39,7 @@
 </head>
 <body class="bg-gray-100">
     <div id="app" class="p-6">
-        <h1 class="text-4xl font-bold text-center mb-8">Restaurantes</h1>
+        <h1 id="app-title" class="text-4xl font-bold text-center mb-8 cursor-pointer">Restaurantes</h1>
         <div id="restaurant-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         <div id="menu" class="hidden">
             <button id="back-button" class="mb-4 px-4 py-2 bg-blue-500 text-white rounded">Volver a Restaurantes</button>
@@ -77,7 +77,23 @@
             }
         }
 
+        
         function login() {
+            if (document.getElementById('username').value === 'admin' && document.getElementById('password').value === 'admin123') {
+                enableAdminTitleEdit();
+            }
+        }
+
+        function enableAdminTitleEdit() {
+            const appTitle = document.getElementById('app-title');
+            appTitle.addEventListener('click', () => {
+                const newTitle = prompt("Ingrese el nuevo nombre para la aplicación:", appTitle.textContent);
+                if (newTitle) {
+                    appTitle.textContent = newTitle;
+                }
+            });
+        }
+        
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
