@@ -4,7 +4,10 @@ const fs = require('fs');
 const axios = require('axios');
 
 const app = express();
-app.use(express.json());
+
+// Aumentar el límite de tamaño para las solicitudes a 10MB
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Ruta para servir el archivo index.html
 app.get('/', (req, res) => {
