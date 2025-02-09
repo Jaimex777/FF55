@@ -145,6 +145,7 @@
                             restaurantData[index].image = imageUrl;
                             displayRestaurants();
                         } else {
+
                             alert('No se pudo actualizar la imagen');
                         }
                     };
@@ -152,6 +153,23 @@
                 }
             });
             fileInput.click();
+        }
+
+        function deleteItem(restaurantIndex, itemIndex) {
+            fetch(`/api/restaurants/${restaurantIndex}/menu/${itemIndex}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    restaurantData[restaurantIndex].menu.splice(itemIndex, 1);
+                    showMenu(restaurantIndex, true);
+                } else {
+                    alert('No se pudo eliminar el producto');
+                }
+            })
+            .catch(error => {
+                console.error('Error al eliminar el producto:', error);
+            });
         }
 
         function showMenu(index, isOwner) {
