@@ -6,6 +6,22 @@ const axios = require('axios');
 const app = express();
 app.use(express.json());
 
+// Ruta para servir el archivo index.html
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
+
+// Ruta para obtener la lista de restaurantes
+app.get('/api/restaurants', (req, res) => {
+  fs.readFile('restaurants.json', 'utf8', (err, data) => {
+    if (err) {
+      res.status(500).send({ message: 'Error leyendo el archivo de restaurantes' });
+    } else {
+      res.json(JSON.parse(data));
+    }
+  });
+});
+
 // Ruta para manejar cambios en los productos
 app.post('/update-products', async (req, res) => {
   const { newData } = req.body;
@@ -73,11 +89,7 @@ async function commitChanges(filePath, content, message) {
   );
 }
 
-// Ruta para servir index.html
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
-
+// Iniciar el servidor
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Servidor escuchando en el puerto ${port}`);
