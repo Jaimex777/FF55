@@ -39,7 +39,7 @@ app.post('/api/restaurants/:restaurantIndex/menu', async (req, res) => {
           await commitChanges('restaurants.json', JSON.stringify(restaurants), 'Agregar nuevo producto');
           res.status(200).send({ message: 'Producto agregado y guardado en GitHub exitosamente' });
       } catch (error) {
-          console.error('Error subiendo cambios a GitHub:', error);
+          console.error('Error subiendo cambios a GitHub:', error.response ? error.response.data : error.message);
           res.status(500).send({ message: 'Producto agregado, pero no se pudo guardar en GitHub' });
       }
 
@@ -66,7 +66,7 @@ app.delete('/api/restaurants/:restaurantIndex/menu/:itemIndex', async (req, res)
         await commitChanges('restaurants.json', JSON.stringify(restaurants), 'Eliminar producto');
         res.status(200).send({ message: 'Producto eliminado y cambios guardados en GitHub' });
     } catch (error) {
-        console.error('Error subiendo cambios a GitHub:', error);
+        console.error('Error subiendo cambios a GitHub:', error.response ? error.response.data : error.message);
         res.status(500).send({ message: 'Producto eliminado, pero no se pudo guardar en GitHub' });
     }
 
@@ -75,7 +75,7 @@ app.delete('/api/restaurants/:restaurantIndex/menu/:itemIndex', async (req, res)
   }
 });
 
-// Función para realizar commit en GitHub
+// Función para realizar commit en GitHub con registro detallado de errores
 async function commitChanges(filePath, content, message) {
   const owner = "TU_NOMBRE_DE_USUARIO";
   const repo = "NOMBRE_DE_TU_REPOSITORIO";
@@ -90,20 +90,32 @@ async function commitChanges(filePath, content, message) {
     });
     sha = response.data.sha;
   } catch (err) {
-    if (err.response && err.response.status !== 404) {
-      throw new Error(`Error obteniendo el archivo desde GitHub: ${err.message}`);
+    if (err.response) {
+      console.error('Error obteniendo el archivo desde GitHub:', err.response.data);
+    } else {
+      console.error('Error obteniendo el archivo desde GitHub:', err.message);
     }
+    throw err;
   }
 
-  await axios.put(
-    `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`,
-    {
-      message: message,
-      content: Buffer.from(content).toString('base64'),
-      sha: sha,
-    },
-    { headers: { Authorization: `token ${token}` } }
-  );
+  try {
+    await axios.put(
+      `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`,
+      {
+        message: message,
+        content: Buffer.from(content).toString('base64'),
+        sha: sha,
+      },
+      { headers: { Authorization: `token ${token}` } }
+    );
+  } catch (err) {
+    if (err.response) {
+      console.error('Error subiendo cambios a GitHub:', err.response.data);
+    } else {
+      console.error('Error subiendo cambios a GitHub:', err.message);
+    }
+    throw err;
+  }
 }
 
 // Iniciar el servidor
