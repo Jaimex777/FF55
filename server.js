@@ -35,6 +35,11 @@ app.post('/update-products', async (req, res) => {
   }
 });
 
+app.get('/api/restaurants', (req, res) => {
+  const restaurants = require('./restaurants.json');
+  res.json(restaurants);
+});
+
 // Función para realizar commit en GitHub
 async function commitChanges(filePath, content, message) {
   const owner = "TU_NOMBRE_DE_USUARIO";
