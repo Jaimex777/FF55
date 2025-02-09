@@ -27,6 +27,21 @@
             justify-content: center;
             cursor: pointer;
         }
+        .edit-image-btn {
+            position: absolute;
+            bottom: 0.5rem;
+            right: 0.5rem;
+            background-color: blue;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -66,7 +81,7 @@
 
     <script>
         let restaurantData = [];
-        let loggedInRestaurant = null;
+        let loggedInUser = null;
 
         async function fetchRestaurants() {
             const response = await fetch('/api/restaurants');
@@ -78,12 +93,16 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            const restaurant = restaurantData.find(r => r.owner === username && r.password === password);
+            const user = restaurantData.find(r => r.owner === username && r.password === password);
 
-            if (restaurant) {
-                loggedInRestaurant = restaurant;
+            if (user) {
+                loggedInUser = user;
                 document.getElementById('login-section').classList.add('hidden');
-                showMenu(restaurantData.indexOf(restaurant), true);
+                if (user.owner === 'admin') {
+                    displayRestaurants();
+                } else {
+                    showMenu(restaurantData.indexOf(user), true);
+                }
             } else {
                 alert('Usuario o contraseña incorrectos');
             }
@@ -94,113 +113,69 @@
             restaurantList.innerHTML = '';
             restaurantData.forEach((restaurant, index) => {
                 const div = document.createElement('div');
-                div.className = 'restaurant-card bg-white rounded-lg shadow-lg cursor-pointer';
+                div.className = 'restaurant-card bg-white rounded-lg shadow-lg cursor-pointer relative';
                 div.innerHTML = `
                     <div class="h-48 bg-cover bg-center rounded-t-lg" style="background-image: url('${restaurant.image}')"></div>
                     <div class="p-4 text-center font-bold text-xl">${restaurant.name}</div>
                 `;
-                div.onclick = () => showMenu(index, false);
+                div.onclick = () => showMenu(index, loggedInUser && (loggedInUser.owner === 'admin' || loggedInUser.owner === restaurant.owner));
+
+                // Si el usuario es administrador, mostrar botón para cambiar la imagen
+                if (loggedInUser && loggedInUser.owner === 'admin') {
+                    const editImageBtn = document.createElement('button');
+                    editImageBtn.className = 'edit-image-btn';
+                    editImageBtn.innerHTML = '&#9998;';
+                    editImageBtn.onclick = (event) => {
+                        event.stopPropagation();
+                        changeRestaurantImage(index);
+                    };
+                    div.appendChild(editImageBtn);
+                }
+
                 restaurantList.appendChild(div);
             });
         }
 
-        function showMenu(index, isOwner) {
-            document.getElementById('restaurant-list').classList.add('hidden');
-            document.getElementById('menu').classList.remove('hidden');
-            const restaurant = restaurantData[index];
-            document.getElementById('menu-title').textContent = restaurant.name;
-            const menuItems = document.getElementById('menu-items');
-            menuItems.innerHTML = '';
+        function changeRestaurantImage(index) {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
 
-            restaurant.menu.forEach((item, itemIndex) => {
-                const div = document.createElement('div');
-                div.className = 'menu-item bg-white rounded-lg shadow-lg p-4 relative';
-                div.innerHTML = `
-                    <img src="${item.image}" alt="${item.name}" class="h-48 w-full object-cover rounded-t-lg">
-                    <h3 class="text-xl font-bold mt-2">${item.name}</h3>
-                    <p class="text-gray-600">${item.description}</p>
-                    <p class="text-lg font-semibold mt-2">${item.price}</p>
-                `;
+            fileInput.onchange = async function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = async function(e) {
+                        const imageUrl = e.target.result;
 
-                if (isOwner) {
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.className = 'delete-btn';
-                    deleteBtn.innerHTML = '&times;';
-                    deleteBtn.onclick = () => deleteItem(index, itemIndex);
-                    div.appendChild(deleteBtn);
+                        const response = await fetch(`/api/restaurants/${index}/image`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ image: imageUrl })
+                        });
+
+                        if (response.ok) {
+                            restaurantData[index].image = imageUrl;
+                            displayRestaurants();
+                        } else {
+                            alert('No se pudo actualizar la imagen');
+                        }
+                    };
+                    reader.readAsDataURL(file);
                 }
-
-                menuItems.appendChild(div);
-            });
-
-            // Mostrar formulario para agregar platos si es propietario
-            if (isOwner) {
-                document.getElementById('add-item-form').classList.remove('hidden');
-                document.getElementById('add-item-button').onclick = () => addItem(index);
-            }
-        }
-
-        async function deleteItem(restaurantIndex, itemIndex) {
-            const response = await fetch(`/api/restaurants/${restaurantIndex}/menu/${itemIndex}`, {
-                method: 'DELETE'
-            });
-
-            if (response.ok) {
-                restaurantData[restaurantIndex].menu.splice(itemIndex, 1);
-                showMenu(restaurantIndex, true);
-            } else {
-                alert('No se pudo eliminar el producto');
-            }
-        }
-
-        async function addItem(restaurantIndex) {
-            const name = document.getElementById('new-item-name').value;
-            const description = document.getElementById('new-item-description').value;
-            const price = document.getElementById('new-item-price').value;
-            const imageFile = document.getElementById('new-item-image').files[0];
-
-            let imageUrl = 'https://via.placeholder.com/300x200?text=Sin+Imagen';
-
-            if (imageFile) {
-                const reader = new FileReader();
-                reader.onload = async function(event) {
-                    imageUrl = event.target.result;
-                    await saveNewItem(restaurantIndex, name, description, price, imageUrl);
-                };
-                reader.readAsDataURL(imageFile);
-            } else {
-                await saveNewItem(restaurantIndex, name, description, price, imageUrl);
-            }
-        }
-
-        async function saveNewItem(restaurantIndex, name, description, price, imageUrl) {
-            const newItem = { name, description, price, image: imageUrl };
-
-            const response = await fetch(`/api/restaurants/${restaurantIndex}/menu`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newItem)
-            });
-
-            if (response.ok) {
-                restaurantData[restaurantIndex].menu.push(newItem);
-                showMenu(restaurantIndex, true);
-            } else {
-                alert('No se pudo agregar el producto');
-            }
+            };
+            fileInput.click();
         }
 
         document.getElementById('login-button').addEventListener('click', login);
 
         document.getElementById('back-button').addEventListener('click', () => {
-            loggedInRestaurant = null;
+            loggedInUser = null;
             document.getElementById('menu').classList.add('hidden');
             document.getElementById('restaurant-list').classList.remove('hidden');
-            document.getElementById('add-item-form').classList.add('hidden');
             displayRestaurants();
         });
 
-        // Cargar los restaurantes al iniciar la página
         fetchRestaurants();
     </script>
 </body>
