@@ -1,4 +1,3 @@
-
 [
   {
     "name": "Restaurante Italiano",
@@ -77,10 +76,5 @@
         "price": "4€"
       }
     ]
-  },
-  {
-    "name": "Administrador",
-    "owner": "admin",
-    "password": "admin123"
   }
 ]
