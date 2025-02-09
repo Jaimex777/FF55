@@ -4,7 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant App</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com">
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const response = await fetch('/api/restaurants');
+        restaurantData = await response.json();
+        displayRestaurants();
+    } catch (error) {
+        console.error('Error al cargar los restaurantes:', error);
+    }
+});
+</script>
+
     <style>
         .restaurant-card, .menu-item {
             transition: transform 0.2s;
