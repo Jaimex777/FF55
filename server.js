@@ -22,6 +22,23 @@ app.get('/api/restaurants', (req, res) => {
   });
 });
 
+// Ruta para agregar un nuevo plato al menú
+app.post('/api/restaurants/:restaurantIndex/menu', (req, res) => {
+  const { restaurantIndex } = req.params;
+  const newItem = req.body;
+
+  let restaurants = require('./restaurants.json');
+  const restIdx = parseInt(restaurantIndex);
+
+  if (restaurants[restIdx]) {
+      restaurants[restIdx].menu.push(newItem);
+      fs.writeFileSync('restaurants.json', JSON.stringify(restaurants, null, 2), 'utf8');
+      res.status(200).send({ message: 'Producto agregado exitosamente' });
+  } else {
+      res.status(404).send({ message: 'Restaurante no encontrado' });
+  }
+});
+
 // Ruta para manejar cambios en los productos
 app.post('/update-products', async (req, res) => {
   const { newData } = req.body;
