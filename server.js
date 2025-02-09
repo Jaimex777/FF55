@@ -1,101 +1,68 @@
+
 const express = require('express');
 const fs = require('fs');
-const path = require('path');
+const axios = require('axios');
+
 const app = express();
-const PORT = process.env.PORT || 3000;
+app.use(express.json());
 
-const dataPath = path.join(__dirname, 'restaurants.json');
+// Ruta para manejar cambios en los productos
+app.post('/update-products', async (req, res) => {
+  const { newData } = req.body;
 
-// Aumentar el límite de carga a 50MB para permitir imágenes más grandes
-app.use(express.json({ limit: '50mb' }));
-app.use(express.static(__dirname));
+  // Guardar cambios en el archivo JSON localmente
+  const jsonFilePath = 'restaurants.json';
+  fs.writeFileSync(jsonFilePath, JSON.stringify(newData, null, 2), 'utf8');
 
-// Servir index.html en la raíz
-app.get('/', (req, res) => {
-    res.sendFile(path.resolve('index.html'));
+  try {
+    // Subir cambios a GitHub
+    await commitChanges(
+      jsonFilePath,
+      JSON.stringify(newData),
+      'Actualizar productos del restaurante'
+    );
+    res.status(200).send({ message: 'Cambios guardados y subidos a GitHub' });
+  } catch (error) {
+    console.error('Error subiendo cambios a GitHub:', error);
+    res.status(500).send({ message: 'Error subiendo cambios a GitHub' });
+  }
 });
 
-// Obtener todos los restaurantes
-app.get('/api/restaurants', (req, res) => {
-    fs.readFile(dataPath, 'utf8', (err, data) => {
-        if (err) return res.status(500).send('Error al leer los datos');
-        res.json(JSON.parse(data));
+// Función para realizar commit en GitHub
+async function commitChanges(filePath, content, message) {
+  const owner = "TU_NOMBRE_DE_USUARIO";
+  const repo = "NOMBRE_DE_TU_REPOSITORIO";
+  const branch = "main"; // Cambia esto si usas otro nombre de branch
+  const token = process.env.GITHUB_TOKEN;
+
+  let sha = null;
+
+  // Obtener el SHA del archivo si ya existe
+  try {
+    const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
+      headers: { Authorization: `token ${token}` },
     });
-});
+    sha = response.data.sha;
+  } catch (err) {
+    if (err.response && err.response.status !== 404) {
+      throw new Error(`Error obteniendo el archivo desde GitHub: ${err.message}`);
+    }
+  }
 
-// Eliminar un producto del menú
-app.delete('/api/restaurants/:restaurantIndex/menu/:itemIndex', (req, res) => {
-    const { restaurantIndex, itemIndex } = req.params;
+  // Crear o actualizar el archivo en el repositorio
+  await axios.put(
+    `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`,
+    {
+      message: message,
+      content: Buffer.from(content).toString('base64'),
+      sha: sha,
+    },
+    { headers: { Authorization: `token ${token}` } }
+  );
+}
 
-    fs.readFile(dataPath, 'utf8', (err, data) => {
-        if (err) return res.status(500).send('Error al leer los datos');
-
-        let restaurants = JSON.parse(data);
-
-        if (restaurants[restaurantIndex] && restaurants[restaurantIndex].menu[itemIndex]) {
-            restaurants[restaurantIndex].menu.splice(itemIndex, 1);
-
-            fs.writeFile(dataPath, JSON.stringify(restaurants, null, 2), err => {
-                if (err) return res.status(500).send('Error al guardar los cambios');
-                res.send('Producto eliminado correctamente');
-            });
-        } else {
-            res.status(404).send('Restaurante o producto no encontrado');
-        }
-    });
-});
-
-// Agregar un nuevo producto al menú
-app.post('/api/restaurants/:restaurantIndex/menu', (req, res) => {
-    const { restaurantIndex } = req.params;
-    const newItem = req.body;
-
-    fs.readFile(dataPath, 'utf8', (err, data) => {
-        if (err) return res.status(500).send('Error al leer los datos');
-
-        let restaurants = JSON.parse(data);
-
-        if (restaurants[restaurantIndex]) {
-            restaurants[restaurantIndex].menu.push(newItem);
-
-            fs.writeFile(dataPath, JSON.stringify(restaurants, null, 2), err => {
-                if (err) return res.status(500).send('Error al guardar los cambios');
-                res.send('Producto agregado correctamente');
-            });
-        } else {
-            res.status(404).send('Restaurante no encontrado');
-        }
-    });
-});
-
-// Actualizar la imagen de portada del restaurante
-app.put('/api/restaurants/:restaurantIndex/image', (req, res) => {
-    const { restaurantIndex } = req.params;
-    const { image } = req.body;
-
-    fs.readFile(dataPath, 'utf8', (err, data) => {
-        if (err) return res.status(500).send('Error al leer los datos');
-
-        let restaurants = JSON.parse(data);
-
-        if (restaurants[restaurantIndex]) {
-            restaurants[restaurantIndex].image = image;
-
-            fs.writeFile(dataPath, JSON.stringify(restaurants, null, 2), err => {
-                if (err) return res.status(500).send('Error al guardar la nueva imagen');
-                res.send('Imagen actualizada correctamente');
-            });
-        } else {
-            res.status(404).send('Restaurante no encontrado');
-        }
-    });
-});
-
-// Ruta comodín para cualquier otra solicitud
-app.get('*', (req, res) => {
-    res.sendFile(path.resolve('index.html'));
-});
-
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+// Iniciar el servidor
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Servidor escuchando en el puerto ${port}`);
 });
