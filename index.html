@@ -26,6 +26,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            z-index: 10;
         }
         .edit-image-btn {
             position: absolute;
@@ -41,6 +42,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            z-index: 10;
         }
     </style>
 </head>
@@ -122,15 +124,43 @@
                     const editImageBtn = document.createElement('button');
                     editImageBtn.className = 'edit-image-btn';
                     editImageBtn.innerHTML = '&#9998;';
-                    editImageBtn.onclick = (event) => {
+                    editImageBtn.addEventListener('click', (event) => {
                         event.stopPropagation();
                         changeRestaurantImage(index);
-                    };
+                    });
                     div.appendChild(editImageBtn);
                 }
 
                 restaurantList.appendChild(div);
             });
+        }
+
+        function changeRestaurantImage(index) {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.onchange = async function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = async function(e) {
+                        const imageUrl = e.target.result;
+                        const response = await fetch(`/api/restaurants/${index}/image`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ image: imageUrl })
+                        });
+                        if (response.ok) {
+                            restaurantData[index].image = imageUrl;
+                            displayRestaurants();
+                        } else {
+                            alert('No se pudo actualizar la imagen');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            fileInput.click();
         }
 
         function showMenu(index, isOwner) {
@@ -156,7 +186,10 @@
                     const deleteBtn = document.createElement('button');
                     deleteBtn.className = 'delete-btn';
                     deleteBtn.innerHTML = '&times;';
-                    deleteBtn.onclick = () => deleteItem(index, itemIndex);
+                    deleteBtn.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        deleteItem(index, itemIndex);
+                    });
                     div.appendChild(deleteBtn);
                 }
 
