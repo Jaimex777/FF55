@@ -45,15 +45,15 @@
         </div>
     </div>
 
-    <!-- Login Section -->
-    <div id="login-section" class="fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg">
+    <!-- Login Section al final de la página -->
+    <footer id="login-section" class="bg-white p-6 shadow-inner mt-10">
         <div class="max-w-sm mx-auto">
-            <h2 class="text-xl font-bold mb-2 text-center">Login de Propietarios</h2>
+            <h2 class="text-xl font-bold mb-4 text-center">Login de Propietarios</h2>
             <input id="username" type="text" placeholder="Usuario" class="w-full p-2 mb-2 border rounded">
-            <input id="password" type="password" placeholder="Contraseña" class="w-full p-2 mb-2 border rounded">
+            <input id="password" type="password" placeholder="Contraseña" class="w-full p-2 mb-4 border rounded">
             <button id="login-button" class="w-full bg-blue-500 text-white p-2 rounded">Iniciar Sesión</button>
         </div>
-    </div>
+    </footer>
 
     <script>
         let restaurantData = [];
@@ -147,6 +147,7 @@
             displayRestaurants();
         });
 
+        // Cargar los restaurantes al iniciar la página
         fetchRestaurants();
     </script>
 </body>
