@@ -77,8 +77,8 @@ app.delete('/api/restaurants/:restaurantIndex/menu/:itemIndex', async (req, res)
 
 // Función para realizar commit en GitHub con registro detallado de errores
 async function commitChanges(filePath, content, message) {
-  const owner = "TU_NOMBRE_DE_USUARIO";
-  const repo = "NOMBRE_DE_TU_REPOSITORIO";
+  const owner = "Jaimex777";
+  const repo = "FF55";
   const branch = "main";
   const token = process.env.GITHUB_TOKEN;
 
