@@ -319,55 +319,23 @@
             }
         }
 
-        
-function showMenu(index, isOwner) {
-    document.getElementById('app-title').classList.add('hidden');
-    document.getElementById('restaurant-list').classList.add('hidden');
-    document.getElementById('menu').classList.remove('hidden');
+        function showMenu(index, isOwner) {
+            document.getElementById('restaurant-list').classList.add('hidden');
+            document.getElementById('menu').classList.remove('hidden');
 
-    const restaurant = restaurantData[index];
-    document.getElementById('menu-title').textContent = restaurant.name;
+            const restaurant = restaurantData[index];
+            document.getElementById('menu-title').textContent = restaurant.name;
+            const menuItems = document.getElementById('menu-items');
+            menuItems.innerHTML = '';
 
-    document.getElementById('restaurant-hours').textContent = restaurant.hours || 'Lunes a Viernes: 12:00 - 22:00';
-    document.getElementById('restaurant-weekend-hours').textContent = restaurant.weekendHours || 'Sábados y Domingos: 13:00 - 23:00';
-    document.getElementById('restaurant-contact').textContent = `Teléfono: ${restaurant.contact || '123-456-789'}`;
-
-    const menuItems = document.getElementById('menu-items');
-    menuItems.innerHTML = '';
-
-    restaurant.menu.forEach((item, itemIndex) => {
-        const div = document.createElement('div');
-        div.className = 'menu-item bg-white rounded-lg shadow-lg p-4 relative';
-        div.innerHTML = `
-            <img src="${item.image}" alt="${item.name}" class="h-48 w-full object-cover rounded-t-lg">
-            <h3 class="text-xl font-bold mt-2">${item.name}</h3>
-            <p class="text-gray-600">${item.description}</p>
-            <p class="text-lg font-semibold mt-2">${item.price} €</p>
-        `;
-
-        if (isOwner || loggedInUser?.owner === 'admin') {
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'delete-btn';
-            deleteBtn.innerHTML = '&times;';
-            deleteBtn.onclick = (e) => {
-                e.stopPropagation();
-                deleteItem(index, itemIndex);
-            };
-            div.appendChild(deleteBtn);
-        }
-
-        menuItems.appendChild(div);
-    });
-
-    if (isOwner || loggedInUser?.owner === 'admin') {
-        document.getElementById('add-item-form').classList.remove('hidden');
-        document.getElementById('add-item-button').onclick = () => addItem(index);
-    }
-}
-" alt="${item.name}" class="h-48 w-full object-cover rounded-t-lg">
+            restaurant.menu.forEach((item, itemIndex) => {
+                const div = document.createElement('div');
+                div.className = 'menu-item bg-white rounded-lg shadow-lg p-4 relative';
+                div.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" class="h-48 w-full object-cover rounded-t-lg">
                     <h3 class="text-xl font-bold mt-2">${item.name}</h3>
                     <p class="text-gray-600">${item.description}</p>
-                    <p class="text-lg font-semibold mt-2">${item.price} €</p>
+                    <p class="text-lg font-semibold mt-2">${item.price} € €</p>
                 `;
 
                 if (isOwner) {
