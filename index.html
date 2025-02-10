@@ -121,7 +121,16 @@
             <button id="back-button" class="mb-4 px-4 py-2 bg-blue-500 text-white rounded">Volver a Restaurantes</button>
             <h2 id="menu-title" class="text-3xl font-bold mb-4"></h2>
             <div id="restaurant-info" class="bg-white p-4 rounded-lg shadow-lg mb-6 relative"></div>
-    <div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    
+        <div class="mt-4 p-4 bg-gray-100 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold mb-2">Horario de Cocina</h3>
+            <p id="restaurant-hours">Lunes a Viernes: 12:00 - 22:00</p>
+            <p id="restaurant-weekend-hours">Sábados y Domingos: 13:00 - 23:00</p>
+            <h3 class="text-xl font-bold mt-4 mb-2">Teléfono de Contacto</h3>
+            <p id="restaurant-contact">+34 123 456 789</p>
+        </div>
+    
+<div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             <div id="add-item-form" class="hidden mt-6 bg-white p-6 rounded-lg shadow-lg">
                 <h3 class="text-2xl font-bold mb-4">Agregar Nuevo Plato</h3>
                 <input id="new-item-name" type="text" placeholder="Nombre del plato" class="w-full p-2 mb-2 border rounded">
@@ -327,6 +336,11 @@
             document.getElementById('menu-title').textContent = restaurant.name;
             const menuItems = document.getElementById('menu-items');
             menuItems.innerHTML = '';
+
+    document.getElementById('restaurant-hours').textContent = restaurant.hours || 'Lunes a Viernes: 12:00 - 22:00';
+    document.getElementById('restaurant-weekend-hours').textContent = restaurant.weekendHours || 'Sábados y Domingos: 13:00 - 23:00';
+    document.getElementById('restaurant-contact').textContent = restaurant.contact || '+34 123 456 789';
+
 
             restaurant.menu.forEach((item, itemIndex) => {
                 const div = document.createElement('div');
